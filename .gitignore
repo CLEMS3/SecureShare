@@ -2,3 +2,6 @@
 secure_chat
 test_files/
 .DS_Store
+*.mp4
+*.txt
+*.part

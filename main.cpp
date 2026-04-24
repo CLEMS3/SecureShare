@@ -212,7 +212,8 @@ void receiveThread(std::shared_ptr<PeerConnection> peer) {
                 plain[0] = 0x03;
                 uint32_t offset_net = htonl(offset);
                 std::memcpy(&plain[1], &offset_net, 4);
-                std::memcpy(&plain[5], &namelen_net, 2);
+                uint16_t nl_net = htons(namelen);
+                std::memcpy(&plain[5], &nl_net, 2);
                 std::memcpy(&plain[7], name.data(), namelen);
                 
                 {
@@ -227,6 +228,14 @@ void receiveThread(std::shared_ptr<PeerConnection> peer) {
                 uint32_t offset_net;
                 std::memcpy(&offset_net, &decrypted[1], 4);
                 peer->resumeOffset = ntohl(offset_net);
+                
+                uint16_t nl_net;
+                std::memcpy(&nl_net, &decrypted[5], 2);
+                uint16_t namelen = ntohs(nl_net);
+                
+                if (decrypted.size() < 7ULL + namelen) continue;
+                std::string name(decrypted.begin() + 7, decrypted.begin() + 7 + namelen);
+                
                 peer->fileReqWait = false;
             } else if (type == 0x04) {
                 if (peer->active_recv_file && peer->active_recv_file->is_open()) {
