@@ -27,7 +27,7 @@ int NetworkManager::host(int port) {
         return -1;
     }
 
-    std::cout << "[System] Node listening on port " << port << "...\n";
+    std::cout << "[System] Node listening on " << getLocalIP() << ":" << port << "...\n";
     return server_socket;
 }
 
@@ -137,6 +137,29 @@ void NetworkManager::closeSocket(int socket) {
     if (socket != -1) {
         ::close(socket);
     }
+}
+
+std::string NetworkManager::getLocalIP() {
+    std::string local_ip = "127.0.0.1";
+    int dummy_sock = ::socket(AF_INET, SOCK_DGRAM, 0);
+    if (dummy_sock >= 0) {
+        struct sockaddr_in serv{};
+        serv.sin_family = AF_INET;
+        inet_pton(AF_INET, "8.8.8.8", &serv.sin_addr);
+        serv.sin_port = htons(53);
+        if (::connect(dummy_sock, (const struct sockaddr*)&serv, sizeof(serv)) == 0) {
+            struct sockaddr_in name{};
+            socklen_t namelen = sizeof(name);
+            if (::getsockname(dummy_sock, (struct sockaddr*)&name, &namelen) == 0) {
+                char buffer[INET_ADDRSTRLEN];
+                if (inet_ntop(AF_INET, &name.sin_addr, buffer, sizeof(buffer))) {
+                    local_ip = buffer;
+                }
+            }
+        }
+        ::close(dummy_sock);
+    }
+    return local_ip;
 }
 
 bool NetworkManager::setSocketTimeout(int socket, int seconds) {

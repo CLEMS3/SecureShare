@@ -32,6 +32,7 @@ public:
     bool receiveString(int socket, std::string& str);
 
     static void closeSocket(int socket);
+    static std::string getLocalIP();
 
     // Timeout control
     static bool setSocketTimeout(int socket, int seconds);

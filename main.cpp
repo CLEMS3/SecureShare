@@ -364,7 +364,7 @@ int main(int argc, char* argv[]) {
     std::thread pt(pingThread);
     pt.detach();
 
-    std::cout << "Welcome " << my_name << "! You are a P2P node listening on port " << listen_port << ".\n";
+    std::cout << "Welcome " << my_name << "! You are a P2P node listening on " << NetworkManager::getLocalIP() << ":" << listen_port << ".\n";
     std::cout << "Commands:\n";
     std::cout << "  /connect <ip> <port>   - Connect to another node\n";
     std::cout << "  /list                  - Show connected peers\n";
